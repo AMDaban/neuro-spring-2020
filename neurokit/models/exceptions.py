@@ -1,0 +1,2 @@
+class InvalidTimeDelta(Exception):
+    pass

@@ -1,21 +1,26 @@
 from scipy.integrate import odeint
 
-from neurokit.models.neuron_state import NeuronState
+from neurokit.models.exceptions import InvalidTimeDelta
 
 
 class LIF:
+    # TODO: tune default parameters
     def __init__(self, c_func, tau=1, u_r=-80, r=10, u_t=0):
         """
+        Leaky Integrate and Fire neuron model
+
+        :param c_func: current function, i.e. I(t)
         :param tau:    time constant
         :param u_r:    rest potential
         :param r:      resistance
         :param u_t:    threshold potential
+        :param dt:     time window in milliseconds
         """
+        self.c_func = c_func
         self.tau = tau
         self.u_r = u_r
         self.r = r
         self.u_t = u_t
-        self.c_func = c_func
 
         # current potential
         self._u = u_r
@@ -23,19 +28,33 @@ class LIF:
         # current time
         self._t = 0
 
-    def run(self, delta_t):
+    def simulate(self, delta_t):
         """
-        calculate next state of neuron at t + delta_t and return it.
+        simulate neuron for next delta_t milliseconds
 
-        :return: next state of neuron at t + delta_t
+        :return: u_values, t_values, spike_times
         """
 
-        def du_dt(u, t):
-            return (-(u - self.u_r) + (self.r * self.c_func(t))) / self.tau
+        if (delta_t < 0) or (not isinstance(delta_t, int)):
+            raise InvalidTimeDelta()
 
-        next_values = odeint(du_dt, self._u, [self._t, self._t + delta_t])
+        spike_times = []
+        u_values = []
+        t_values = []
 
-        self._u = next_values[-1]
+        for t in range(self._t, self._t + delta_t):
+            next_values = odeint(self._du_dt, self._u, [t, t + 1])
+            self._u = next_values[-1]
+
+            u_values.append(self._u)
+            t_values.append(t)
+            if self._u >= self.u_t:
+                self._u = self.u_r
+                spike_times.append(t)
+
         self._t += delta_t
 
-        return NeuronState(self._u, self._t)
+        return u_values, t_values, spike_times
+
+    def _du_dt(self, u, t):
+        return (-(u - self.u_r) + (self.r * self.c_func(t))) / self.tau
