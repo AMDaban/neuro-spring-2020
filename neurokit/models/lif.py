@@ -5,7 +5,7 @@ from neurokit.models.exceptions import InvalidTimeDelta
 
 class LIF:
     # TODO: tune default parameters
-    def __init__(self, c_func, tau=1, u_r=-80, r=10, u_t=0):
+    def __init__(self, c_func, tau=20, u_r=-80, r=10, u_t=0):
         """
         Leaky Integrate and Fire neuron model
 
@@ -44,13 +44,14 @@ class LIF:
 
         for t in range(self._t, self._t + delta_t):
             next_values = odeint(self._du_dt, self._u, [t, t + 1])
-            self._u = next_values[-1]
+            self._u = next_values[-1][0]
 
-            u_values.append(self._u)
-            t_values.append(t)
             if self._u >= self.u_t:
                 self._u = self.u_r
                 spike_times.append(t)
+
+            u_values.append(self._u)
+            t_values.append(t)
 
         self._t += delta_t
 
