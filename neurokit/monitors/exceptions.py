@@ -1,0 +1,2 @@
+class InvalidObservations(Exception):
+    pass
