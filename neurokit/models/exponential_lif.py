@@ -15,7 +15,6 @@ class ExponentialLIF:
         :param u_r:         rest potential
         :param r:           resistance
         :param u_t:         threshold potential
-        :param dt:          time window in milliseconds
         :param delta_t:     sharpness parameter
         :param theta_rh:    firing threshold
         :param dt:          time window size
