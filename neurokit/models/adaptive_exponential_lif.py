@@ -34,7 +34,6 @@ class AdaptiveExponentialLIF(LIF):
         self.b = float(b)
 
         self._w = 0
-        self._spike_count = 0
 
     def _comp_dw(self):
         """
@@ -43,21 +42,23 @@ class AdaptiveExponentialLIF(LIF):
         :return: dw
         """
         a, b = self.a, self.b
-        dt = self.dt
+        dt, tau_w = self.dt, self.tau_w
         u, u_r = self._u, self.u_r
         w = self._w
-        spike_count, tau_w = self._spike_count, self.tau_w
+        _, _, _, spikes = self.get_monitor().get_observations()
 
-        dw_dt = (a * (u - u_r) - w + b * tau_w * spike_count) / tau_w
+        dw_dt = (a * (u - u_r) - w + b * tau_w * len(spikes)) / tau_w
         return dw_dt * dt
 
     # noinspection DuplicatedCode
     def _comp_du(self):
         """
-        Computes current du
+        Computes current du, also updates w
 
         :return: du
         """
+        self._w = self._w + self._comp_dw()
+
         u, u_r = self._u, self.u_r
         t, dt, tau_m = self._t, self.dt, self.tau_m
         delta_t, theta_rh = self.delta_t, self.theta_rh
@@ -67,25 +68,3 @@ class AdaptiveExponentialLIF(LIF):
         f_u = -(u - u_r) + delta_t * math.exp((u - theta_rh) / delta_t)
         du_dt = (f_u - r * w + r * c_func(t)) / tau_m
         return du_dt * dt
-
-    def _step(self):
-        """
-        Simulates next state of model and set variables,
-        also this method observe u values and spike times
-        """
-        self._w = self._w + self._comp_dw()
-
-        next_u = self._u + self._comp_du()
-        next_t = self._t + self.dt
-
-        spiked = False
-        if next_u >= self.u_t:
-            self._spike_count += 1
-            next_u = self.u_r
-            spiked = True
-
-        if self.observe:
-            self._monitor.observe(next_t, next_u, self._c_func(self._t), spiked)
-
-        self._u = next_u
-        self._t = next_t
