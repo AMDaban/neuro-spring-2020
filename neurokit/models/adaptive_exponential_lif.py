@@ -1,10 +1,11 @@
 import math
 
+from neurokit.models.lif import LIF
 from neurokit.models.exceptions import InvalidTimeDelta, InvalidObserve
 from neurokit.monitors.neuron_monitor import NeuronMonitor
 
 
-class AdaptiveExponentialLIF:
+class AdaptiveExponentialLIF(LIF):
     # TODO: tune default parameters
     def __init__(self, c_func, tau_m=20, tau_w=20, u_r=-80, r=10, u_t=0, delta_t=1, theta_rh=1, a=1, b=1, dt=0.001):
         """
@@ -22,41 +23,18 @@ class AdaptiveExponentialLIF:
         :param b:           spike coefficient
         :param dt:          time window size
         """
-        self.c_func = c_func
+
+        LIF.__init__(self, c_func=c_func, u_r=u_r, r=r, u_t=u_t, dt=dt)
+
         self.tau_m = float(tau_m)
         self.tau_w = float(tau_w)
-        self.u_r = float(u_r)
-        self.r = float(r)
-        self.u_t = float(u_t)
         self.delta_t = float(delta_t)
         self.theta_rh = float(theta_rh)
         self.a = float(a)
         self.b = float(b)
-        self.dt = float(dt)
-        self.observe = True
 
-        # current potential
-        self._u = self.u_r
-
-        # abstract current variables
         self._w = 0
-
-        # needed to compute w
         self._spike_count = 0
-
-        # current time
-        self._t = 0.0
-
-        # monitor
-        self._monitor = NeuronMonitor()
-
-    def set_observe(self, observe):
-        if not isinstance(observe, bool):
-            raise InvalidObserve()
-        self.observe = observe
-
-    def get_monitor(self):
-        return self._monitor
 
     def _comp_dw(self):
         """
@@ -73,6 +51,7 @@ class AdaptiveExponentialLIF:
         dw_dt = (a * (u - u_r) - w + b * tau_w * spike_count) / tau_w
         return dw_dt * dt
 
+    # noinspection DuplicatedCode
     def _comp_du(self):
         """
         Computes current du
@@ -110,18 +89,3 @@ class AdaptiveExponentialLIF:
 
         self._u = next_u
         self._t = next_t
-
-    def steps(self, n):
-        """
-        Simulate next n steps of model
-
-        :param n: number of steps to simulate
-        """
-        if (self._t == 0.0) and self.observe:
-            self._monitor.observe(self._t, self._u, self._c_func(self._t), False)
-
-        for _ in range(n):
-            self._step()
-
-    def _c_func(self, t):
-        return float(self.c_func(t))

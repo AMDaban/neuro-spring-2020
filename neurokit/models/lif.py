@@ -1,5 +1,5 @@
-from neurokit.models.exceptions import InvalidTimeDelta, InvalidObserve
 from neurokit.monitors.neuron_monitor import NeuronMonitor
+from neurokit.models.exceptions import InvalidObserve
 
 
 class LIF:
@@ -23,37 +23,39 @@ class LIF:
         self.dt = float(dt)
         self.observe = True
 
-        # current potential
         self._u = self.u_r
-
-        # current time
         self._t = 0.0
-
-        # monitor
         self._monitor = NeuronMonitor()
 
     def set_observe(self, observe):
+        """
+        Set the observe value, if this value is set, spikes and potentials will be recorded
+
+        :param observe: new observe value
+        """
         if not isinstance(observe, bool):
             raise InvalidObserve()
         self.observe = observe
 
     def get_monitor(self):
+        """
+        Get neuron monitor
+
+        :return: neuron monitor
+        """
         return self._monitor
 
-    def _comp_du(self):
+    def steps(self, n):
         """
-        Computes current du
+        Simulate next n steps of model
 
-        :return: du
+        :param n: number of steps to simulate
         """
-        u, u_r = self._u, self.u_r
-        t, dt, tau = self._t, self.dt, self.tau
-        r = self.r
-        c_func = self._c_func
+        if (self._t == 0.0) and self.observe:
+            self._monitor.observe(self._t, self._u, self._c_func(self._t), False)
 
-        f_u = -(u - u_r)
-        du_dt = (f_u + r * c_func(t)) / tau
-        return du_dt * dt
+        for _ in range(n):
+            self._step()
 
     def _step(self):
         """
@@ -74,17 +76,20 @@ class LIF:
         self._u = next_u
         self._t = next_t
 
-    def steps(self, n):
+    def _comp_du(self):
         """
-        Simulate next n steps of model
+        Computes current du
 
-        :param n: number of steps to simulate
+        :return: du
         """
-        if (self._t == 0.0) and self.observe:
-            self._monitor.observe(self._t, self._u, self._c_func(self._t), False)
+        u, u_r = self._u, self.u_r
+        t, dt, tau = self._t, self.dt, self.tau
+        r = self.r
+        c_func = self._c_func
 
-        for _ in range(n):
-            self._step()
+        f_u = -(u - u_r)
+        du_dt = (f_u + r * c_func(t)) / tau
+        return du_dt * dt
 
     def _c_func(self, t):
         return float(self.c_func(t))
