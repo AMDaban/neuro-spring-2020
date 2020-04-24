@@ -35,3 +35,14 @@ class NeuronMonitor:
 
     def get_observations(self):
         return self._times, self._u_values, self._c_values, self._spikes
+
+    def last_observation(self):
+        if len(self._times) == 0:
+            return None
+
+        last_t = self._times[-1]
+        last_u = self._u_values[-1]
+        last_c = self._c_values[-1]
+        spiked = (len(self._spikes) != 0) and (self._spikes[-1] == t)
+
+        return last_t, last_u, last_c, spiked

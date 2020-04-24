@@ -29,6 +29,7 @@ class LIF:
         self._monitor = NeuronMonitor()
         self._out_synapses = []
         self._potential_changes = defaultdict(float)
+        self._in_c = 0
 
     def register_out_synapse(self, synapse):
         """
@@ -57,6 +58,9 @@ class LIF:
         :return: neuron monitor
         """
         return self._monitor
+
+    def set_in_c(self, c):
+        self._in_c = c
 
     def steps(self, n):
         """
@@ -98,7 +102,7 @@ class LIF:
         t = self.context.t()
         potential_change = self._potential_changes.pop(t, 0)
 
-        self.c += potential_change
+        self.c += potential_change + self._in_c
 
     def _comp_du(self):
         """

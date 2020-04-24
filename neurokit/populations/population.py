@@ -1,11 +1,15 @@
 from neurokit.populations.exceptions import InvalidIndex
 from neurokit.synapses.synapse import Synapse
+from neurokit.monitors.population_monitor import PopulationMonitor
 
 
 class Population:
-    def __init__(self, dimensions, context, neuron_init):
+    def __init__(self, identifier, dimensions, context, neuron_init):
+        self.name = identifier
         self.x_dim, self.y_dim = dimensions
         self.context = context
+
+        self._monitor = PopulationMonitor()
 
         self.neurons = []
         for i in range(self.x_dim):
@@ -37,9 +41,31 @@ class Population:
         for i in range(n):
             self._step()
 
-    def _step(self):
+    def set_neuron_in_c(self, idx, c):
+        neuron = self.get_neuron(idx[0], idx[1])
+        if neuron is None:
+            raise InvalidIndex()
+
+        neuron.set_in_c(c)
+
+    def set_pop_in_c(self, c):
         for neuron in self._neuron_iter():
-            neuron.steps(1)
+            neuron.set_in_c(c)
+
+    def _step(self):
+        current_t = self.context.t()
+        spiked_indices = []
+
+        for i in range(len(self.neurons)):
+            for j in range(len(self.neurons[i])):
+                self.neurons[i][j].steps(1)
+
+                _, _, _, spiked = self.neurons[i][j].last_observation()
+                if spiked:
+                    spiked_indices.append((i, j))
+
+        if len(spiked_indices) > 0:
+            self._monitor.observe(current_t, spiked_indices)
 
     def _neuron_iter(self):
         for i in range(len(self.neurons)):
