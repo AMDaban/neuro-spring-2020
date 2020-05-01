@@ -13,7 +13,7 @@ x_size = 5
 y_size = 100
 n = x_size * y_size
 exc_size = (4 * n) / 5
-simulation_steps = 1000
+simulation_steps = 10000
 dt = 0.001
 
 first_non_zero_c_time = 0.005
@@ -60,7 +60,11 @@ def get_pop_in_c():
 
 def get_neuron_init(context):
     def neuron_init(x, y):
-        return LIF(context=context, tau=tau, u_r=u_r, u_t=u_t, r=r)
+        # p = ((x * y_size + y) / n) + 1/2
+        # return LIF(context=context, tau=tau*p, u_r=u_r, u_t=u_t*p, r=r*p)
+
+        return LIF(context=context, tau=tau * (random.random() + 0.1), u_r=u_r, u_t=u_t * (random.random() + 0.1),
+                   r=r * (random.random() + 0.1))
 
     return neuron_init
 
@@ -72,12 +76,15 @@ def connect_neurons(population):
         first_x, first_y = random.randint(0, x_size - 1), random.randint(0, y_size - 1)
         sec_x, sec_y = random.randint(0, x_size - 1), random.randint(0, y_size - 1)
 
+        if (first_x, first_y) == (sec_x, sec_y):
+            continue
+
         key = f"{first_x}_{first_y}_{sec_x}_{sec_y}"
         if key in connected_indices:
             continue
         connected_indices.add(key)
 
-        if first_x * x_size + first_y <= exc_size:
+        if first_x * y_size + first_y <= exc_size:
             w = w_con
         else:
             w = w_in_con
@@ -94,7 +101,6 @@ def plot_result(population):
         t = t_spikes[0]
         spiked_neurons = t_spikes[1]
         for spiked_neuron in spiked_neurons:
-            print("shit")
             neuron_idx = spiked_neuron[0] * y_size + spiked_neuron[1]
             data_source['neuron_idx'].append(neuron_idx)
             data_source['time'].append(t)
@@ -104,31 +110,11 @@ def plot_result(population):
                 data_source['group'].append("in")
     df = pd.DataFrame(data=data_source)
 
-    print(df)
-
-    sns.scatterplot(x="time", y="neuron_idx", data=df,  hue="group", s=5)
+    sns.scatterplot(x="time", y="neuron_idx", data=df, hue="group", s=5)
     plt.title("Raster Plot")
     plt.ylabel("Neuron")
     plt.xlabel("time")
     plt.show()
-
-    # spike_chart = []
-    # for t_spikes in spikes:
-    #     t = t_spikes[0]
-    #     spiked_neurons = t_spikes[1]
-    #     for spiked_neuron in spiked_neurons:
-    #         neuron_idx = spiked_neuron[0] * y_size + spiked_neuron[1]
-    #         spike_chart.append((neuron_idx, t))
-    #
-    # spike_chart = np.array(spike_chart)
-    #
-    # print(len(c_samples))
-    #
-    # sns.scatterplot(x=spike_chart[:, 1], y=spike_chart[:, 0], s=5)
-    # plt.title("Raster Plot")
-    # plt.ylabel("Neuron")
-    # plt.xlabel("time")
-    # plt.show()
 
 
 def main():
