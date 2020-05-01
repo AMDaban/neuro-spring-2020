@@ -43,6 +43,6 @@ class NeuronMonitor:
         last_t = self._times[-1]
         last_u = self._u_values[-1]
         last_c = self._c_values[-1]
-        spiked = (len(self._spikes) != 0) and (self._spikes[-1] == t)
+        spiked = (len(self._spikes) != 0) and (self._spikes[-1] == last_t)
 
         return last_t, last_u, last_c, spiked

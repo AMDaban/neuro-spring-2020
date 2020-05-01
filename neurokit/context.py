@@ -3,9 +3,9 @@ class Context:
         """
         Neural Context Contains Global Configurations of neurons and synapses
         """
-        self.dt = float(dt)
+        self._dt = float(dt)
 
-        self._t = 0
+        self._t = 0.0
 
     def t(self):
         """
@@ -21,10 +21,10 @@ class Context:
 
         :return: dt
         """
-        return self.dt
+        return self._dt
 
     def step(self):
         """
         Compute next state of Context
         """
-        self._t += self.dt
+        self._t += self._dt

@@ -17,19 +17,22 @@ class LIF:
         :param u_t:         threshold potential
         :param context:     global context
         """
+
+        def default_in_c(t):
+            return 0
+
         self.tau = float(tau)
         self.u_r = float(u_r)
         self.r = float(r)
         self.u_t = float(u_t)
-        self.observe = True
         self.context = context
 
-        self._c = 0
+        self._c = 0.0
         self._u = self.u_r
         self._monitor = NeuronMonitor()
         self._out_synapses = []
         self._potential_changes = defaultdict(float)
-        self._in_c = 0
+        self._in_c = default_in_c
 
     def register_out_synapse(self, synapse):
         """
@@ -43,14 +46,6 @@ class LIF:
         if t > self.context.t():
             self._potential_changes[t] += dw
 
-    def set_observe(self, observe):
-        """
-        Set the observe value, if this value is set, spikes and potentials will be recorded
-
-        :param observe: new observe value
-        """
-        self.observe = observe
-
     def get_monitor(self):
         """
         Get neuron monitor
@@ -59,8 +54,8 @@ class LIF:
         """
         return self._monitor
 
-    def set_in_c(self, c):
-        self._in_c = c
+    def set_in_c(self, c_func):
+        self._in_c = c_func
 
     def steps(self, n):
         """
@@ -70,7 +65,7 @@ class LIF:
         """
         t = self.context.t()
 
-        if (t == 0.0) and self.observe:
+        if t == 0.0:
             self._monitor.observe(t, self._u, self._c, False)
 
         for _ in range(n):
@@ -93,8 +88,11 @@ class LIF:
             next_u = self.u_r
             spiked = True
 
-        if self.observe:
-            self._monitor.observe(next_t, next_u, self._c, spiked)
+        self._monitor.observe(next_t, next_u, self._c, spiked)
+
+        if spiked:
+            for out_synapse in self._out_synapses:
+                out_synapse.register_spike()
 
         self._u = next_u
 
@@ -102,7 +100,7 @@ class LIF:
         t = self.context.t()
         potential_change = self._potential_changes.pop(t, 0)
 
-        self.c += potential_change + self._in_c
+        self._c += potential_change + self._in_c(t)
 
     def _comp_du(self):
         """

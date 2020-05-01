@@ -37,6 +37,9 @@ class Population:
         except IndexError:
             return None
 
+    def get_monitor(self):
+        return self._monitor
+
     def steps(self, n):
         for i in range(n):
             self._step()
@@ -48,24 +51,25 @@ class Population:
 
         neuron.set_in_c(c)
 
-    def set_pop_in_c(self, c):
+    def set_pop_in_c(self, c_func):
         for neuron in self._neuron_iter():
-            neuron.set_in_c(c)
+            neuron.set_in_c(c_func)
 
     def _step(self):
         current_t = self.context.t()
-        spiked_indices = []
+        if current_t == 0:
+            self._monitor.observe(0, [])
 
+        spiked_indices = []
         for i in range(len(self.neurons)):
             for j in range(len(self.neurons[i])):
                 self.neurons[i][j].steps(1)
 
-                _, _, _, spiked = self.neurons[i][j].last_observation()
+                _, _, _, spiked = self.neurons[i][j].get_monitor().last_observation()
                 if spiked:
                     spiked_indices.append((i, j))
 
-        if len(spiked_indices) > 0:
-            self._monitor.observe(current_t, spiked_indices)
+        self._monitor.observe(current_t + self.context.dt(), spiked_indices)
 
     def _neuron_iter(self):
         for i in range(len(self.neurons)):
