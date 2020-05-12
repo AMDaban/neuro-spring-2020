@@ -16,13 +16,13 @@ exc_size = (4 * n) / 5
 simulation_steps = 10000
 dt = 0.001
 
-first_non_zero_c_time = 0.005
-last_non_zero_c_time = 0.09
-random_c_func_maximum_c_change = 0.3
+first_non_zero_c_time = 0.5
+last_non_zero_c_time = 9
+random_c_func_maximum_c_change = 0.001
 random_c_func_maximum_c = 1
 c_samples = {}
 
-connections = 100
+connections = 0
 w_con = 10
 w_in_con = -20
 d_con = 1
@@ -114,6 +114,18 @@ def plot_result(population):
     plt.title("Raster Plot")
     plt.ylabel("Neuron")
     plt.xlabel("time")
+    plt.show()
+
+    def sort_func(x):
+        return x[0]
+
+    c_items = list(c_samples.items())
+    c_items.sort(key=sort_func)
+    ts = [x[0] for x in c_items]
+    cs = [x[1] for x in c_items]
+    plt.plot(ts, cs)
+    plt.xlabel('time')
+    plt.ylabel('C(t)')
     plt.show()
 
 

@@ -31,6 +31,7 @@ class LIF:
         self._u = self.u_r
         self._monitor = NeuronMonitor()
         self._out_synapses = []
+        self._in_synapses = []
         self._potential_changes = defaultdict(float)
         self._in_c = default_in_c
 
@@ -41,6 +42,14 @@ class LIF:
         :param synapse: an instance of Synapse class
         """
         self._out_synapses.append(synapse)
+
+    def register_in_synapse(self, synapse):
+        """
+        Register in synapse
+
+        :param synapse: an instance of Synapse class
+        """
+        self._in_synapses.append(synapse)
 
     def register_potential_change(self, dw, t):
         if t > self.context.t():
@@ -93,6 +102,8 @@ class LIF:
         if spiked:
             for out_synapse in self._out_synapses:
                 out_synapse.register_spike()
+            for in_synapse in self._in_synapses:
+                in_synapse.notify_spike()
 
         self._u = next_u
 

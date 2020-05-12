@@ -1,3 +1,6 @@
+import math
+
+
 class Synapse:
     def __init__(self, src, dest, context, w=0, d=1):
         self.src = src
@@ -10,5 +13,37 @@ class Synapse:
         if self.d <= 0:
             self.d = 1
 
+        self.s_times = []
+        self.d_times = []
+
     def register_spike(self):
-        self.dest.register_potential_change(self.w, self.context.t() + self.d * self.context.dt())
+        t, dt = self.context.t(), self.context.dt()
+
+        self.s_times.append(t)
+        self.dest.register_potential_change(self.w, t + self.d * dt)
+
+        self._apply_stdp()
+
+    def notify_spike(self):
+        t = self.context.t()
+
+        self.d_times.append(t)
+
+        self._apply_stdp()
+
+    def _apply_stdp(self):
+        enabled, a_p, a_n, tau_p, tau_n = self.context.stdp_info()
+        if not enabled:
+            return
+
+        if (len(self.s_times) == 0) or (len(self.d_times) == 0):
+            return
+
+        last_s = self.s_times[-1]
+        last_d = self.d_times[-1]
+
+        a, tau, delta_t = a_p, tau_p, math.fabs(last_s - last_d)
+        if last_d < last_s:
+            a, tau = a_n, tau_n
+
+        self.w += a * math.exp(-1 * delta_t / tau)
