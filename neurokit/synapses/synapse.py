@@ -46,4 +46,9 @@ class Synapse:
         if last_d < last_s:
             a, tau = a_n, tau_n
 
-        self.w += a * math.exp(-1 * delta_t / tau)
+        w_change = a * math.exp(-1 * delta_t / tau)
+
+        self.w += w_change
+
+        if w_change != 0:
+            print(w_change, delta_t, self.w, end=' | ')

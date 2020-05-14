@@ -109,6 +109,7 @@ def connect_outer_neurons(p1, p2, mode, context):
 
         synapse = Synapse(src_neuron, dest_neuron, context, w, d_con)
         src_neuron.register_out_synapse(synapse)
+        dest_neuron.register_in_synapse(synapse)
 
         connected_neurons += 1
 

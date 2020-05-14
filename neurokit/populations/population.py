@@ -30,6 +30,7 @@ class Population:
 
         synapse = Synapse(src_neuron, dest_neuron, self.context, w, d)
         src_neuron.register_out_synapse(synapse)
+        dest_neuron.register_in_synapse(synapse)
 
     def get_neuron(self, i, j):
         try:
