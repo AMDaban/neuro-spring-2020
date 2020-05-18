@@ -7,7 +7,7 @@ from neurokit.context import Context
 
 class LIF:
     # TODO: tune default parameters
-    def __init__(self, tau=20, u_r=-80, r=10, u_t=0, context=Context(0.001)):
+    def __init__(self, tau=20, u_r=-80, r=10, u_t=0, context=Context(0.001), name=""):
         """
         Exponential Leaky Integrate and Fire neuron model
 
@@ -26,6 +26,7 @@ class LIF:
         self.r = float(r)
         self.u_t = float(u_t)
         self.context = context
+        self.name = name
 
         self._c = 0.0
         self._u = self.u_r
@@ -111,7 +112,7 @@ class LIF:
         t = self.context.t()
         potential_change = self._potential_changes.pop(t, 0)
 
-        self._c += potential_change + self._in_c(t)
+        self._c = float(potential_change + self._in_c(t))
 
     def _comp_du(self):
         """
