@@ -4,34 +4,41 @@ from neurokit.context import Context
 from neurokit.populations.population import Population
 from neurokit.models.lif import LIF
 
-pattern_1 = [1, 2, 1, 1, 2, 3, 4, 1, 5, 2]
-pattern_2 = [3, 4, 4, 2, 1, 2, 5, 2, 3, 1]
+pattern_1 = [1, 1, 0, 0, 0, 0, 3, 4, 5, 0]
+pattern_2 = [0, 0, 0, 0, 0, 0, 1, 1, 1, 1]
 last_applied_pattern = 2
 
 # Simulation
-steps = 1000
+steps = 10000
 
 # Context
 dt = 1
 stdp_enabled = True
 a_p = 0.1
-a_n = -0.3
+a_n = -0.6
 tau_p = 2
 tau_n = 2
 
 # Neuron
-tau = 2.5
+tau = 1
 u_r = -70
 u_t = -50
-r = 2
+r = 1
 
 # Synapse
-mu = 5
-sigma = 0.1
+mu = 6
+sigma = 0.05
 d = 1
+
 
 def get_neuron_init(context):
     def neuron_init(x, y):
+        if y == 10:
+            return LIF(context=context, tau=tau, u_r=u_r, u_t=-50, r=r, name=f"({x}, {y})")
+
+        if y == 11:
+            return LIF(context=context, tau=tau, u_r=u_r, u_t=-60, r=r, name=f"({x}, {y})")
+
         return LIF(context=context, tau=tau, u_r=u_r, u_t=u_t, r=r, name=f"({x}, {y})")
 
     return neuron_init
@@ -47,8 +54,19 @@ def main():
         pop.connect_two((0, i), (0, 10), w=np.random.normal(mu, sigma), d=d)
         pop.connect_two((0, i), (0, 11), w=np.random.normal(mu, sigma), d=d)
 
+    d1 = pop.get_neuron(0, 10)
+    d2 = pop.get_neuron(0, 11)
+    for i in range(10):
+        neu = pop.get_neuron(0, i)
+        for s in neu._out_synapses:
+            if s.dest is d1:
+                print(i, 10, s.w)
+            else:
+                print(i, 11, s.w)
+    print("")
+
     for i in range(steps):
-        if i % 50 == 0:
+        if i % 100 == 0:
             pat = pattern_1
             ap = 1
             if last_applied_pattern == 1:
@@ -64,6 +82,8 @@ def main():
 
         pop.steps(1)
         context.step()
+
+    # print(d2.get_monitor().get_observations())
 
     d1 = pop.get_neuron(0, 10)
     d2 = pop.get_neuron(0, 11)

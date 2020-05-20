@@ -17,7 +17,7 @@ class Synapse:
         self.d_times = []
 
     def register_spike(self):
-        # print("SPIKE", self.src.name)
+        # print("SPIKE", self.src.name, self.context.t(), self.w)
         t, dt = self.context.t(), self.context.dt()
 
         self.s_times.append(t)
@@ -26,7 +26,7 @@ class Synapse:
         self._apply_stdp()
 
     def notify_spike(self):
-        print("OUT_SPIKE", self.dest.name)
+        print("OUT_SPIKE", self.dest.name, self.context.t())
         t = self.context.t()
 
         self.d_times.append(t)
@@ -53,6 +53,6 @@ class Synapse:
 
         w_change = a * math.exp(-1 * delta_t / tau)
 
-        # print(w_change, delta_t)
+        # print(w_change, delta_t, self.src.name, self.dest.name)
 
         self.w += w_change
