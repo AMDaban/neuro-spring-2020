@@ -18,6 +18,8 @@ class Population:
                 row.append(neuron_init(i, j))
             self.neurons.append(row)
 
+        self.synapses = []
+
     def connect_two(self, src, dest, w, d):
         try:
             src_neuron = self.get_neuron(src[0], src[1])
@@ -31,6 +33,7 @@ class Population:
         synapse = Synapse(src_neuron, dest_neuron, self.context, w, d)
         src_neuron.register_out_synapse(synapse)
         dest_neuron.register_in_synapse(synapse)
+        self.synapses.append(synapse)
 
     def get_neuron(self, i, j):
         try:
@@ -69,6 +72,9 @@ class Population:
                 _, _, _, spiked = self.neurons[i][j].get_monitor().last_observation()
                 if spiked:
                     spiked_indices.append((i, j))
+
+        for synapse in self.synapses:
+            synapse.steps(1)
 
         self._monitor.observe(current_t + self.context.dt(), spiked_indices)
 

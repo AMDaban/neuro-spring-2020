@@ -53,3 +53,10 @@ class Synapse:
 
 
         self.w += w_change
+
+    def steps(self, n):
+        for _ in range(n):
+            self._step()
+
+    def _step(self):
+        pass
