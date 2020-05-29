@@ -94,10 +94,10 @@ def main():
     for i in range(10):
         neu = pop.get_neuron(0, i)
         for s in neu._out_synapses:
-            if s.dest is d1:
+            if s.dest is d2:
                 print(i, 10, s.w)
-            else:
-                print(i, 11, s.w)
+            # else:
+            #     print(i, 11, s.w)
 
     context.stdp_enabled = False
 
