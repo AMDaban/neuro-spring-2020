@@ -1,5 +1,7 @@
 import math
 
+from neurokit.learning_rule import STDP, RMSTDP
+
 
 class Synapse:
     def __init__(self, src, dest, context, w=0, d=1):
@@ -22,19 +24,29 @@ class Synapse:
         self.s_times.append(t)
         self.dest.register_potential_change(self.w, t + self.d * dt)
 
-        self._apply_stdp()
+        self._apply_learning_rule()
 
     def notify_spike(self):
         t = self.context.t()
 
         self.d_times.append(t)
 
-        self._apply_stdp()
+        self._apply_learning_rule()
+
+    def steps(self, n):
+        for _ in range(n):
+            self._step()
+
+    def _apply_learning_rule(self):
+        learning_rule = self.context.learning_rule()
+        if isinstance(learning_rule, STDP):
+            self._apply_stdp()
+        elif isinstance(learning_rule, RMSTDP):
+            self._apply_rmstdp()
 
     def _apply_stdp(self):
-        enabled, a_p, a_n, tau_p, tau_n = self.context.stdp_info()
-        if not enabled:
-            return
+        rule = self.context.learning_rule()
+        a_p, a_n, tau_p, tau_n = rule.a_p, rule.a_n, rule.tau_p, rule.tau_n
 
         if (len(self.s_times) == 0) or (len(self.d_times) == 0):
             return
@@ -51,12 +63,10 @@ class Synapse:
 
         w_change = a * math.exp(-1 * delta_t / tau)
 
-
         self.w += w_change
 
-    def steps(self, n):
-        for _ in range(n):
-            self._step()
+    def _apply_rmstdp(self):
+        pass
 
     def _step(self):
         pass

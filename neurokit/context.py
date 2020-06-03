@@ -1,14 +1,10 @@
 class Context:
-    def __init__(self, dt, stdp_enabled=True, a_p=1, a_n=1, tau_p=1, tau_n=1):
+    def __init__(self, dt, learning_rule=None):
         """
         Neural Context Contains Global Configurations of neurons and synapses
         """
         self._dt = float(dt)
-        self.stdp_enabled = stdp_enabled
-        self.a_p = float(a_p)
-        self.a_n = float(a_n)
-        self.tau_p = float(tau_p)
-        self.tau_n = float(tau_n)
+        self._learning_rule = learning_rule
 
         self._t = 0.0
 
@@ -34,11 +30,9 @@ class Context:
         """
         self._t = self.t() + self.dt()
 
-    def stdp_info(self):
+    def learning_rule(self):
         """
-        Returns stdp related information
-
-        :return: stdp related information
+        Returns learning rule
+        :return: learning rule
         """
-
-        return self.stdp_enabled, self.a_p, self.a_n, self.tau_p, self.tau_n
+        return self._learning_rule
