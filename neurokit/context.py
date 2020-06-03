@@ -7,6 +7,7 @@ class Context:
         self._learning_rule = learning_rule
 
         self._t = 0.0
+        self._dop = 0.0
 
     def t(self):
         """
@@ -29,6 +30,7 @@ class Context:
         Compute next state of Context
         """
         self._t = self.t() + self.dt()
+        self._dop = 0.0
 
     def learning_rule(self):
         """
@@ -36,3 +38,17 @@ class Context:
         :return: learning rule
         """
         return self._learning_rule
+
+    def dopamine(self):
+        """
+        Returns dopamine
+        :return: dopamine
+        """
+        return self._dop
+
+    def set_dopamine(self, dop):
+        """
+        sets dopamine
+        :param dop: value to set
+        """
+        self._dop = dop

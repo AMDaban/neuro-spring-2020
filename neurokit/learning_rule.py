@@ -11,4 +11,7 @@ class STDP(Rule):
 
 
 class RMSTDP(Rule):
-    pass
+    def __init__(self, stdp_rule, tau_c, tau_d):
+        self.stdp_rule = stdp_rule
+        self.tau_c = float(tau_c)
+        self.tau_d = float(tau_d)

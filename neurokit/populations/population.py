@@ -74,7 +74,7 @@ class Population:
                     spiked_indices.append((i, j))
 
         for synapse in self.synapses:
-            synapse.steps(1)
+            synapse.step()
 
         self._monitor.observe(current_t + self.context.dt(), spiked_indices)
 
