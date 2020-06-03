@@ -83,7 +83,7 @@ class Synapse:
         a_p, a_n, tau_p, tau_n = stdp_rule.a_p, stdp_rule.a_n, stdp_rule.tau_p, stdp_rule.tau_n
 
         if (len(self.s_times) == 0) or (len(self.d_times) == 0):
-            return
+            return 0
 
         last_s = self.s_times[-1]
         last_d = self.d_times[-1]
