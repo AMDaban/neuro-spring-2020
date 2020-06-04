@@ -7,7 +7,7 @@ class Context:
         self._learning_rule = learning_rule
 
         self._t = 0.0
-        self._dop = 0.0
+        self._dop_schedules = []
 
     def t(self):
         """
@@ -30,7 +30,6 @@ class Context:
         Compute next state of Context
         """
         self._t = self.t() + self.dt()
-        self._dop = 0.0
 
     def learning_rule(self):
         """
@@ -44,11 +43,20 @@ class Context:
         Returns dopamine
         :return: dopamine
         """
-        return self._dop
+        dop = 0
+        dop_schedules, t = self._dop_schedules, self.t()
 
-    def set_dopamine(self, dop):
+        for schedule in self._dop_schedules:
+            if schedule[0] <= t < schedule[1]:
+                dop += schedule[2]
+
+        return dop
+
+    def change_dopamine(self, dop_delta, steps):
         """
-        sets dopamine
-        :param dop: value to set
+        change dopamine
+        :param dop_delta: value to change
+        :param steps: steps count
         """
-        self._dop = dop
+        next_t = self.t() + 1
+        self._dop_schedules.append((next_t, next_t + steps, dop_delta))
