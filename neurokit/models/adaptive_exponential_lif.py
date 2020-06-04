@@ -1,14 +1,13 @@
 import math
 
 from neurokit.models.lif import LIF
-from neurokit.monitors.neuron_monitor import NeuronMonitor
 from neurokit.context import Context
 
 
 class AdaptiveExponentialLIF(LIF):
     # TODO: tune default parameters
     def __init__(self, tau_m=20, tau_w=20, u_r=-80, r=10, u_t=0, delta_t=1, theta_rh=1, a=1, b=1,
-                 context=Context(0.001)):
+                 context=Context(0.001), spike_cb=None):
         """
         Exponential Leaky Integrate and Fire neuron model
 
@@ -22,9 +21,10 @@ class AdaptiveExponentialLIF(LIF):
         :param a:           source of subthreshold adaptation
         :param b:           spike coefficient
         :param context:     global context
+        :param spike_cb:    spike callback
         """
 
-        LIF.__init__(self, u_r=u_r, r=r, u_t=u_t, context=context)
+        LIF.__init__(self, u_r=u_r, r=r, u_t=u_t, context=context, spike_cb=spike_cb)
 
         self.tau_m = float(tau_m)
         self.tau_w = float(tau_w)

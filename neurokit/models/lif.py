@@ -1,13 +1,12 @@
 from collections import defaultdict
 
 from neurokit.monitors.neuron_monitor import NeuronMonitor
-from neurokit.synapses.synapse import Synapse
 from neurokit.context import Context
 
 
 class LIF:
     # TODO: tune default parameters
-    def __init__(self, tau=20, u_r=-80, r=10, u_t=0, context=Context(0.001), name=""):
+    def __init__(self, tau=20, u_r=-80, r=10, u_t=0, context=Context(0.001), name="", spike_cb=None):
         """
         Exponential Leaky Integrate and Fire neuron model
 
@@ -16,6 +15,7 @@ class LIF:
         :param r:           resistance
         :param u_t:         threshold potential
         :param context:     global context
+        :param spike_cb:    spike callback
         """
 
         def default_in_c(t):
@@ -27,6 +27,7 @@ class LIF:
         self.u_t = float(u_t)
         self.context = context
         self.name = name
+        self.spike_cb = spike_cb
 
         self._c = 0.0
         self._u = self.u_r
@@ -99,6 +100,8 @@ class LIF:
             spiked = True
 
         self._monitor.observe(next_t, next_u, self._c, spiked)
+        if (self.spike_cb is not None) and spiked:
+            self.spike_cb(self.name)
 
         if spiked:
             for out_synapse in self._out_synapses:

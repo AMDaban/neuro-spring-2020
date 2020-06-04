@@ -1,13 +1,12 @@
 import math
 
 from neurokit.models.lif import LIF
-from neurokit.monitors.neuron_monitor import NeuronMonitor
 from neurokit.context import Context
 
 
 class ExponentialLIF(LIF):
     # TODO: tune default parameters
-    def __init__(self, tau=20, u_r=-80, r=10, u_t=0, delta_t=1, theta_rh=1, context=Context(0.001)):
+    def __init__(self, tau=20, u_r=-80, r=10, u_t=0, delta_t=1, theta_rh=1, context=Context(0.001), spike_cb=None):
         """
         Exponential Leaky Integrate and Fire neuron model
 
@@ -18,9 +17,10 @@ class ExponentialLIF(LIF):
         :param delta_t:     sharpness parameter
         :param theta_rh:    firing threshold
         :param context:     global context
+        :param spike_cb:    spike callback
         """
 
-        LIF.__init__(self, tau=tau, u_r=u_r, r=r, u_t=u_t, context=context)
+        LIF.__init__(self, tau=tau, u_r=u_r, r=r, u_t=u_t, context=context, spike_cb=spike_cb)
 
         self.delta_t = float(delta_t)
         self.theta_rh = float(theta_rh)
