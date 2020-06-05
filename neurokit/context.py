@@ -58,5 +58,5 @@ class Context:
         :param dop_delta: value to change
         :param steps: steps count
         """
-        next_t = self.t() + 1
-        self._dop_schedules.append((next_t, next_t + steps, dop_delta))
+        next_t, dt = self.t() + 1, self.dt()
+        self._dop_schedules.append((next_t, next_t + steps * dt, dop_delta))
