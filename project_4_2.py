@@ -1,4 +1,5 @@
 import random
+from collections import defaultdict
 
 import numpy as np
 from tqdm import trange
@@ -38,17 +39,17 @@ tau_c = 1
 tau_d = 1
 
 # Dopamine
-p_d = 100
-n_d = -100
-t_d = 4
+p_d = 20
+n_d = -30
+t_d = 2
 
 # Connections
-con_prob = 0.5
+con_prob = 0.3
 con_w_mu = 6
 con_w_sigma = 0.05
 con_w_mu_inhb = -10
 con_w_sigma_ihb = 0.05
-con_d_range  = [1, 3]
+con_d_range = [1, 3]
 
 context = None
 pop = None
@@ -57,8 +58,8 @@ inp_neurons_global = []
 pat_neurons_global = []
 pats_global = []
 mod = 0
-window_spiked_neurons = []
-test_window_spikes = []
+window_spiked_neurons = defaultdict(int)
+test_window_spikes = defaultdict(int)
 
 
 # noinspection PyUnresolvedReferences
@@ -68,12 +69,12 @@ def test():
     mod = 1
 
     for pat_idx, pat in enumerate(pats_global):
-        test_window_spikes = []
+        test_window_spikes = defaultdict(int)
 
         for idx, j in enumerate(pat):
             neuron_idx = inp_neurons_global[idx]
-            neuron = pop.get_neuron(neuron_idx[0], neuron_idx[1])
             if j != 0:
+                neuron = pop.get_neuron(neuron_idx[0], neuron_idx[1])
                 neuron.register_potential_change(u_t - u_r + 10, context.t() + context.dt() * j)
 
         for i in range(pat_window_size + 5):
@@ -86,12 +87,16 @@ def test():
             sp_count = 0
             for neu in pat_neurons:
                 if neu in test_window_spikes:
-                    sp_count += 1
+                    sp_count += test_window_spikes[neu]
 
             if sp_count > max_spike:
                 max_spike = sp_count
                 max_spike_pat = idx
         print(pat_idx, '->', max_spike_pat, 'with', max_spike)
+
+        for i in range(pat_window_size + 5):
+            pop.steps(1)
+            context.step()
 
     mod = 0
 
@@ -104,11 +109,13 @@ def spike_check():
         sp_count = 0
         for neu in pat_neurons:
             if neu in window_spiked_neurons:
-                sp_count += 1
+                sp_count += window_spiked_neurons[neu]
 
         if sp_count > max_spike:
             max_spike = sp_count
             max_spike_pat = idx
+
+    # print(last_applied_pattern, max_spike_pat, max_spike)
 
     if max_spike_pat == last_applied_pattern:
         context.change_dopamine(p_d, t_d)
@@ -126,14 +133,14 @@ def simulate():
             spike_check()
 
         if i % (pat_window_size + 5) == 0:
-            window_spiked_neurons = []
+            window_spiked_neurons = defaultdict(int)
             last_applied_pattern = (last_applied_pattern + 1) % pat_count
             next_spike_check = i + pat_window_size + 1
 
             for idx, j in enumerate(pats_global[last_applied_pattern]):
                 neuron_idx = inp_neurons_global[idx]
-                neuron = pop.get_neuron(neuron_idx[0], neuron_idx[1])
                 if j != 0:
+                    neuron = pop.get_neuron(neuron_idx[0], neuron_idx[1])
                     neuron.register_potential_change(u_t - u_r + 10, context.t() + context.dt() * j)
 
         pop.steps(1)
@@ -144,9 +151,11 @@ def spike_cb(name):
     splitted = name.split('_')
 
     if mod == 0:
-        window_spiked_neurons.append((int(splitted[0]), int(splitted[1])))
+        window_spiked_neurons[(int(splitted[0]), int(splitted[1]))] = window_spiked_neurons[
+                                                                          (int(splitted[0]), int(splitted[1]))] + 1
     else:
-        test_window_spikes.append((int(splitted[0]), int(splitted[1])))
+        test_window_spikes[(int(splitted[0]), int(splitted[1]))] = test_window_spikes[
+                                                                       (int(splitted[0]), int(splitted[1]))] + 1
 
 
 def neuron_init(x, y):
@@ -193,7 +202,7 @@ def choose_neurons():
 
     for i in range(input_size):
         idx = random_index()
-        while idx in chosen_neurons:
+        while (idx in chosen_neurons) or is_inhb(idx):
             idx = random_index()
         inp_neurons.append(idx)
         chosen_neurons.add(idx)
@@ -202,7 +211,7 @@ def choose_neurons():
         pat_neurons.append([])
         for j in range(pat_res_size):
             idx = random_index()
-            while idx in chosen_neurons:
+            while (idx in chosen_neurons) or is_inhb(idx):
                 idx = random_index()
             pat_neurons[i].append(idx)
             chosen_neurons.add(idx)
@@ -234,7 +243,7 @@ def main():
         tau_c=tau_c,
         tau_d=tau_d
     )
-    context = Context(dt=dt, learning_rule=learning_rule)
+    context = Context(dt=dt, learning_rule=None)
 
     print("creating  population ...")
     pop = Population("pop", size, context, neuron_init)
