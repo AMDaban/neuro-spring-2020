@@ -39,16 +39,16 @@ tau_c = 1
 tau_d = 1
 
 # Dopamine
-p_d = 20
-n_d = -30
-t_d = 2
+p_d = 5
+n_d = -20
+t_d = 1
 
 # Connections
-con_prob = 0.3
-con_w_mu = 6
-con_w_sigma = 0.05
-con_w_mu_inhb = -10
-con_w_sigma_ihb = 0.05
+con_prob = 0.5
+con_w_mu = 4
+con_w_sigma = 0.1
+con_w_mu_inhb = -30
+con_w_sigma_ihb = 0.1
 con_d_range = [1, 3]
 
 context = None
@@ -103,6 +103,8 @@ def test():
 
 # noinspection PyUnresolvedReferences
 def spike_check():
+    sum_spike = 0
+
     max_spike_pat = -1
     max_spike = -1
     for idx, pat_neurons in enumerate(pat_neurons_global):
@@ -110,16 +112,17 @@ def spike_check():
         for neu in pat_neurons:
             if neu in window_spiked_neurons:
                 sp_count += window_spiked_neurons[neu]
+                sum_spike += window_spiked_neurons[neu]
 
         if sp_count > max_spike:
             max_spike = sp_count
             max_spike_pat = idx
 
-    # print(last_applied_pattern, max_spike_pat, max_spike)
-
-    if max_spike_pat == last_applied_pattern:
+    if (max_spike_pat == last_applied_pattern) and ((max_spike / sum_spike) > 0.5):
+        print(last_applied_pattern, max_spike_pat, max_spike, "rew", sum_spike)
         context.change_dopamine(p_d, t_d)
     else:
+        print(last_applied_pattern, max_spike_pat, max_spike, "pun", sum_spike)
         context.change_dopamine(n_d, t_d)
 
 
@@ -151,11 +154,9 @@ def spike_cb(name):
     splitted = name.split('_')
 
     if mod == 0:
-        window_spiked_neurons[(int(splitted[0]), int(splitted[1]))] = window_spiked_neurons[
-                                                                          (int(splitted[0]), int(splitted[1]))] + 1
+        window_spiked_neurons[(int(splitted[0]), int(splitted[1]))] += 1
     else:
-        test_window_spikes[(int(splitted[0]), int(splitted[1]))] = test_window_spikes[
-                                                                       (int(splitted[0]), int(splitted[1]))] + 1
+        test_window_spikes[(int(splitted[0]), int(splitted[1]))] += 1
 
 
 def neuron_init(x, y):
@@ -243,7 +244,7 @@ def main():
         tau_c=tau_c,
         tau_d=tau_d
     )
-    context = Context(dt=dt, learning_rule=None)
+    context = Context(dt=dt, learning_rule=learning_rule)
 
     print("creating  population ...")
     pop = Population("pop", size, context, neuron_init)
