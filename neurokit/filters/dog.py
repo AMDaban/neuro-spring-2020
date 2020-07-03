@@ -1,8 +1,11 @@
 import numpy as np
 
-class DOG2D:
+from .base import Filter
+
+class DOG2D(Filter):
     def __init__(self, size, s1, s2):
-        self._size = size
+        Filter.__init__(self, size)
+
         self._s1 = s1
         self._s2 = s2
 
@@ -16,6 +19,3 @@ class DOG2D:
             g2 = (1 / self._s2) * np.exp(-(i ** 2 + j ** 2) / (2 * self._s2 ** 2))
             return (1 / np.sqrt(2 * np.pi) * (g1 - g2))
         return index_value
-
-    def compute(self):
-        return np.fromfunction(self._index_value_func(), (self._size, self._size))
