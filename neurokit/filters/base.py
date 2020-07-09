@@ -8,4 +8,5 @@ class Filter:
         raise Exception('not implemented')
 
     def compute(self):
-        return np.fromfunction(self._index_value_func(), (self._size, self._size))
+        kernel = np.fromfunction(self._index_value_func(), (self._size, self._size))
+        return kernel - np.mean(kernel)

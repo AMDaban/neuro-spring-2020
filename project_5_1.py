@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 from neurokit.filters.dog import DOG2D
 from neurokit.operators.convoloution import Convolution2D
 
-IMAGE_PATH = "pics/car.jpg"
+IMAGE_PATH = "pics/einstein.jpg"
 
 def main():
     main_single(dog_size=7,dog_sigma_1=0.3,dog_sigma_2=1,dog_partitions=3,conv_padding=True,conv_stride=1,conv_kp=0.2)
