@@ -5,10 +5,18 @@ import matplotlib.pyplot as plt
 from neurokit.filters.gabor import Gabor2D
 from neurokit.operators.convoloution import Convolution2D
 
-IMAGE_PATH = "pics/car.jpg"
+IMAGE_PATH = "pics/einstein.jpg"
 
 def main():
+    main_single(g_size=3,g_lambda=15,g_sigma=7.5,g_gamma=0.5,g_partitions=3,conv_padding=True,conv_stride=1,conv_kp=0)
+    main_single(g_size=5,g_lambda=15,g_sigma=7.5,g_gamma=0.5,g_partitions=3,conv_padding=True,conv_stride=1,conv_kp=0)
+    main_single(g_size=7,g_lambda=15,g_sigma=7.5,g_gamma=0.5,g_partitions=3,conv_padding=True,conv_stride=1,conv_kp=0)
+    main_single(g_size=9,g_lambda=15,g_sigma=7.5,g_gamma=0.5,g_partitions=3,conv_padding=True,conv_stride=1,conv_kp=0)
+    main_single(g_size=11,g_lambda=15,g_sigma=7.5,g_gamma=0.5,g_partitions=3,conv_padding=True,conv_stride=1,conv_kp=0)
+    main_single(g_size=13,g_lambda=15,g_sigma=7.5,g_gamma=0.5,g_partitions=3,conv_padding=True,conv_stride=1,conv_kp=0)
+    main_single(g_size=15,g_lambda=15,g_sigma=7.5,g_gamma=0.5,g_partitions=3,conv_padding=True,conv_stride=1,conv_kp=0)
     main_single(g_size=17,g_lambda=15,g_sigma=7.5,g_gamma=0.5,g_partitions=3,conv_padding=True,conv_stride=1,conv_kp=0)
+
 
 def main_single(g_size, g_lambda, g_sigma, g_gamma, g_partitions, conv_padding, conv_stride, conv_kp):
     img = cv2.imread(IMAGE_PATH, 0) 
