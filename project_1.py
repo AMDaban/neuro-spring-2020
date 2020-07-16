@@ -15,8 +15,8 @@ first_non_zero_c_time = 5
 last_non_zero_c_time = 70
 steps = 100000
 dt = 0.001
-first_test_c = 5
-second_test_c = 10
+first_test_c = 20
+second_test_c = 25
 f_c_range = np.arange(0, 50, 1)
 
 
@@ -232,45 +232,45 @@ def test_p4_part2(tau_m, tau_w, u_r, u_t, r, delta_t, theta_rh, a, b):
 
 
 def main():
-    # practice 1
-    test_p1(tau=10, u_r=-80, u_t=0, r=10)
-    test_p1(tau=20, u_r=-80, u_t=0, r=10)
-    test_p1(tau=30, u_r=-80, u_t=0, r=10)
-    test_p1(tau=40, u_r=-80, u_t=0, r=10)
-    test_p1(tau=50, u_r=-80, u_t=0, r=10)
+    practice 1
+    test_p1(tau=10, u_r=-70, u_t=-50, r=1)
+    test_p1(tau=20, u_r=-80, u_t=-50, r=2)
+    test_p1(tau=5, u_r=-80, u_t=-50, r=1)
+    test_p1(tau=40, u_r=-80, u_t=-50, r=1)
+    test_p1(tau=50, u_r=-80, u_t=-50, r=2)
 
     # practice 2
-    test_p2(tau=10, u_r=-80, u_t=0, r=10)
-    test_p2(tau=10, u_r=-80, u_t=-10, r=10)
-    test_p2(tau=10, u_r=-80, u_t=-15, r=10)
-    test_p2(tau=10, u_r=-80, u_t=0, r=15)
-    test_p2(tau=20, u_r=-80, u_t=0, r=10)
+    test_p2(tau=10, u_r=-70, u_t=-50, r=1)
+    test_p2(tau=20, u_r=-80, u_t=-50, r=2)
+    test_p2(tau=5, u_r=-80, u_t=-60, r=5)
+    test_p2(tau=40, u_r=-80, u_t=-50, r=1)
+    test_p2(tau=50, u_r=-80, u_t=-50, r=10)
 
     # practice 3  - part 1
-    test_p3_part1(tau=10, u_r=-80, u_t=0, r=10, delta_t=1, theta_rh=1)
-    test_p3_part1(tau=20, u_r=-80, u_t=0, r=10, delta_t=1, theta_rh=1)
-    test_p3_part1(tau=30, u_r=-80, u_t=0, r=10, delta_t=1, theta_rh=1)
+    test_p3_part1(tau=10, u_r=-70, u_t=-55, r=1, delta_t=1, theta_rh=1)
+    test_p3_part1(tau=20, u_r=-70, u_t=-50, r=1, delta_t=20, theta_rh=1)
+    test_p3_part1(tau=30, u_r=-70, u_t=-55, r=1, delta_t=30, theta_rh=20)
     test_p3_part1(tau=40, u_r=-80, u_t=0, r=10, delta_t=1, theta_rh=1)
     test_p3_part1(tau=50, u_r=-80, u_t=0, r=10, delta_t=1, theta_rh=1)
 
     # practice 3 - part 2
-    test_p3_part2(tau=10, u_r=-80, u_t=0, r=10, delta_t=1, theta_rh=1)
+    test_p3_part2(tau=10, u_r=-70, u_t=-55, r=1, delta_t=1, theta_rh=1)
     test_p3_part2(tau=10, u_r=-80, u_t=-10, r=10, delta_t=1, theta_rh=1)
-    test_p3_part2(tau=10, u_r=-80, u_t=-20, r=10, delta_t=1, theta_rh=1)
+    test_p3_part2(tau=30, u_r=-70, u_t=-65, r=1, delta_t=30, theta_rh=20)
     test_p3_part2(tau=10, u_r=-80, u_t=-15, r=10, delta_t=1, theta_rh=1)
     test_p3_part2(tau=20, u_r=-80, u_t=0, r=10, delta_t=1, theta_rh=1)
 
     # practice 4  - part 1
-    test_p4_part1(tau_m=10, tau_w=10, u_r=-80, u_t=0, r=10, delta_t=1, theta_rh=1, a=1, b=1)
+    test_p4_part1(tau_m=10, tau_w=10, u_r=-70, u_t=-55, r=1, delta_t=1, theta_rh=1, a=1, b=1)
     test_p4_part1(tau_m=20, tau_w=20, u_r=-80, u_t=0, r=10, delta_t=1, theta_rh=1, a=1, b=1)
-    test_p4_part1(tau_m=30, tau_w=30, u_r=-80, u_t=0, r=10, delta_t=1, theta_rh=1, a=1, b=1)
+    test_p4_part1(tau_m=30, tau_w=30, u_r=-80, u_t=-40, r=10, delta_t=20, theta_rh=1, a=1, b=1)
     test_p4_part1(tau_m=40, tau_w=40, u_r=-80, u_t=0, r=10, delta_t=1, theta_rh=1, a=1, b=1)
     test_p4_part1(tau_m=50, tau_w=50, u_r=-80, u_t=0, r=10, delta_t=1, theta_rh=1, a=1, b=1)
 
     # practice 4 - part 2
     test_p4_part2(tau_m=10, tau_w=10, u_r=-80, u_t=0, r=10, delta_t=1, theta_rh=1, a=1, b=1)
     test_p4_part2(tau_m=10, tau_w=10, u_r=-80, u_t=-10, r=10, delta_t=1, theta_rh=1, a=1, b=1)
-    test_p4_part2(tau_m=10, tau_w=10, u_r=-80, u_t=-20, r=10, delta_t=1, theta_rh=1, a=1, b=1)
+    test_p4_part2(tau_m=30, tau_w=30, u_r=-80, u_t=-60, r=20, delta_t=20, theta_rh=1, a=1, b=1)
     test_p4_part2(tau_m=10, tau_w=10, u_r=-80, u_t=-15, r=10, delta_t=1, theta_rh=1, a=1, b=1)
     test_p4_part2(tau_m=20, tau_w=20, u_r=-80, u_t=0, r=10, delta_t=1, theta_rh=1, a=1, b=1)
 
