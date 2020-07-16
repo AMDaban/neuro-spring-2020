@@ -10,20 +10,21 @@ from neurokit.populations.population import Population
 from neurokit.models.lif import LIF
 
 x_size = 5
-y_size = 100
+y_size = 200
 n = x_size * y_size
 exc_size = (4 * n) / 5
 simulation_steps = 10000
 dt = 0.001
 
 first_non_zero_c_time = 0.5
-last_non_zero_c_time = 9
-random_c_func_maximum_c_change = 0.001
-random_c_func_maximum_c = 1
+last_non_zero_c_time = 9.5
+random_c_func_maximum_c_change = 0.5
+random_c_func_maximum_c = 40
+initial_c = 20
 c_samples = {}
 
 connections = 100
-w_con = 10
+w_con = 20
 w_in_con = -20
 d_con = 1
 
@@ -34,7 +35,7 @@ r = 10
 
 
 def get_pop_in_c():
-    c = 0
+    c = initial_c
 
     def pop_in_c(t):
         nonlocal c
@@ -43,7 +44,8 @@ def get_pop_in_c():
             return c_samples.get(t)
 
         if t < first_non_zero_c_time or t > last_non_zero_c_time:
-            c = 0
+            c_samples[t] = 0
+            return 0
         else:
             c += (random.random() - 0.5) * random_c_func_maximum_c_change
             if c < 0:
