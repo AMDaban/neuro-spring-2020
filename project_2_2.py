@@ -10,43 +10,48 @@ from neurokit.populations.population import Population
 from neurokit.models.lif import LIF
 from neurokit.synapses.synapse import Synapse
 
-x_size = 10
-y_size = 10
+x_size = 1
+y_size = 100
 n = x_size * y_size
 simulation_steps = 10000
 dt = 0.001
 
 first_non_zero_c_time = 0.5
-last_non_zero_c_time = 9
-random_c_func_maximum_c_change = 0.001
-random_c_func_maximum_c = 1
-c_samples = {}
+last_non_zero_c_time = 9.5
+random_c_func_maximum_c_change = 0.5
+random_c_func_maximum_c = 40
+initial_c = 20
+c_samples_1 = {}
+c_samples_2 = {}
 
-inner_connections = 100
-e_outer_connections = 100
-i_outer_connections = 100
 w_ee = 10
 w_ie = -1000
-w_ei = 10
+w_ei = 1000
 d_con = 1
 
-tau = 10
+tau = 4
 u_r = -70
-u_t = -50
-r = 10
+u_t = -60
+r = 5
 
 
-def get_pop_in_c():
-    c = 0
+def get_pop_in_c(mode):
+    c = initial_c
+
+    if mode == 1:
+        c_samples = c_samples_1
+    else:
+        c_samples = c_samples_2
 
     def pop_in_c(t):
-        nonlocal c
+        nonlocal c, c_samples
 
         if c_samples.get(t) is not None:
             return c_samples.get(t)
 
         if t < first_non_zero_c_time or t > last_non_zero_c_time:
-            c = 0
+            c_samples[t] = 0
+            return 0
         else:
             c += (random.random() - 0.5) * random_c_func_maximum_c_change
             if c < 0:
@@ -68,10 +73,10 @@ def get_neuron_init(context):
     return neuron_init
 
 
-def connect_inner_neurons(population):
+def connect_inner_neurons(population, count, w):
     connected_indices = set()
     connected_neurons = 0
-    while connected_neurons < inner_connections:
+    while connected_neurons < count:
         first_x, first_y = random.randint(0, x_size - 1), random.randint(0, y_size - 1)
         sec_x, sec_y = random.randint(0, x_size - 1), random.randint(0, y_size - 1)
 
@@ -83,17 +88,15 @@ def connect_inner_neurons(population):
             continue
         connected_indices.add(key)
 
-        population.connect_two((first_x, first_y), (sec_x, sec_y), w_ee, d_con)
+        population.connect_two((first_x, first_y), (sec_x, sec_y), w, d_con)
         connected_neurons += 1
 
 
-def connect_outer_neurons(p1, p2, mode, context):
+def connect_outer_neurons(p1, p2, context, count, w):
     connected_indices = set()
     connected_neurons = 0
 
-    outer_connections = e_outer_connections if mode == 'ei' else i_outer_connections
-
-    while connected_neurons < outer_connections:
+    while connected_neurons < count:
         first_x, first_y = random.randint(0, x_size - 1), random.randint(0, y_size - 1)
         sec_x, sec_y = random.randint(0, x_size - 1), random.randint(0, y_size - 1)
 
@@ -105,7 +108,7 @@ def connect_outer_neurons(p1, p2, mode, context):
         src_neuron = p1.get_neuron(first_x, first_y)
         dest_neuron = p2.get_neuron(sec_x, sec_y)
 
-        w = w_ei if mode == 'ei' else w_ie
+        # w = w_ei if mode == 'ei' else w_ie
 
         synapse = Synapse(src_neuron, dest_neuron, context, w, d_con)
         src_neuron.register_out_synapse(synapse)
@@ -113,7 +116,7 @@ def connect_outer_neurons(p1, p2, mode, context):
         connected_neurons += 1
 
 
-def plot_result(population):
+def plot_result(population, mode):
     spikes = population.get_monitor().get_observations()
 
     spike_count = 0
@@ -143,6 +146,13 @@ def plot_result(population):
     def sort_func(x):
         return x[0]
 
+    if mode == 1:
+        c_samples = c_samples_1
+    elif mode == 2:
+        c_samples = c_samples_2
+    else:
+        return
+
     c_items = list(c_samples.items())
     c_items.sort(key=sort_func)
     ts = [x[0] for x in c_items]
@@ -156,22 +166,25 @@ def plot_result(population):
 def main():
     context = Context(dt=dt)
 
-    pop_in_c = get_pop_in_c()
-
+    pop_in_c_1 = get_pop_in_c(1)
     e1 = Population("e1", (x_size, y_size), context, get_neuron_init(context))
-    e1.set_pop_in_c(pop_in_c)
-    connect_inner_neurons(e1)
+    e1.set_pop_in_c(pop_in_c_1)
+    connect_inner_neurons(e1, 1000, 100)
 
+    pop_in_c_2 = get_pop_in_c(2)
     e2 = Population("e2", (x_size, y_size), context, get_neuron_init(context))
-    e2.set_pop_in_c(pop_in_c)
-    connect_inner_neurons(e2)
+    e2.set_pop_in_c(pop_in_c_2)
+    connect_inner_neurons(e2, 1000, 100)
 
     i1 = Population("i1", (x_size, y_size), context, get_neuron_init(context))
 
-    connect_outer_neurons(e1, i1, "ei", context)
-    connect_outer_neurons(e2, i1, "ei", context)
-    connect_outer_neurons(i1, e1, "ie", context)
-    connect_outer_neurons(i1, e2, "ie", context)
+    connect_outer_neurons(e1, e2, context, 1000, 100)
+    connect_outer_neurons(e2, e1, context, 1000, 100)
+
+    connect_outer_neurons(e1, i1, context, 3000, 100)
+    connect_outer_neurons(e2, i1, context, 3000, 100)
+    connect_outer_neurons(i1, e1, context, 3000, -300)
+    connect_outer_neurons(i1, e2, context, 3000, -300)
 
     for i in range(simulation_steps):
         e1.steps(1)
@@ -179,9 +192,9 @@ def main():
         i1.steps(1)
         context.step()
 
-    plot_result(e1)
-    plot_result(e2)
-    plot_result(i1)
+    plot_result(e1, 1)
+    plot_result(e2, 2)
+    plot_result(i1, 3)
 
 
 if __name__ == '__main__':
