@@ -27,4 +27,4 @@ class Context:
         """
         Compute next state of Context
         """
-        self._t += self._dt
+        self._t = self.t() + self.dt()

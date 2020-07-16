@@ -100,7 +100,7 @@ class LIF:
         t = self.context.t()
         potential_change = self._potential_changes.pop(t, 0)
 
-        self._c += potential_change + self._in_c(t)
+        self._c = float(potential_change + self._in_c(t))
 
     def _comp_du(self):
         """
