@@ -164,15 +164,15 @@ def connect_neurons(e1, e2, i1):
     pass
 
 def connect_neurons_t1(e1, e2, i1):
-    c1 = RandomConnectorFixedProb(pre=e1, post=e1, w_mu=2, w_sigma=0.1, w_mu_inh=0, w_sigma_inh=0, d=1, is_exc_func=lambda x: True, prob=0.02)
+    c1 = RandomConnectorFixedPre(pre=e1, post=e1, w_mu=2, w_sigma=0.1, w_mu_inh=0, w_sigma_inh=0, d=1, is_exc_func=lambda x: True, pre_cons=8)
     c1.connect(context)
 
-    c2 = RandomConnectorFixedProb(pre=e2, post=e2, w_mu=2, w_sigma=0.1, w_mu_inh=0, w_sigma_inh=0, d=1, is_exc_func=lambda x: True, prob=0.02)
+    c2 = RandomConnectorFixedPre(pre=e2, post=e2, w_mu=2, w_sigma=0.1, w_mu_inh=0, w_sigma_inh=0, d=1, is_exc_func=lambda x: True, pre_cons=8)
     c2.connect(context)
 
-    c3 = RandomConnectorFixedProb(pre=e1, post=i1, w_mu=2, w_sigma=0.1, w_mu_inh=0, w_sigma_inh=0, d=1, is_exc_func=lambda x: True, prob=0.02)
+    c3 = RandomConnectorFixedPre(pre=e1, post=i1, w_mu=2, w_sigma=0.1, w_mu_inh=0, w_sigma_inh=0, d=1, is_exc_func=lambda x: True, pre_cons=8)
     c3.connect(context)
-    c4 = RandomConnectorFixedProb(pre=e2, post=i1, w_mu=2, w_sigma=0.1, w_mu_inh=0, w_sigma_inh=0, d=1, is_exc_func=lambda x: True, prob=0.02)
+    c4 = RandomConnectorFixedPre(pre=e2, post=i1, w_mu=2, w_sigma=0.1, w_mu_inh=0, w_sigma_inh=0, d=1, is_exc_func=lambda x: True, pre_cons=8)
     c4.connect(context)
 
     # c5 = RandomConnectorFixedProb(pre=e1, post=e2, w_mu=0.5, w_sigma=0.1, w_mu_inh=0, w_sigma_inh=0, d=1, is_exc_func=lambda x: True, prob=0.01)
@@ -181,9 +181,9 @@ def connect_neurons_t1(e1, e2, i1):
     # c6 = RandomConnectorFixedProb(pre=e2, post=e1, w_mu=0.5, w_sigma=0.1, w_mu_inh=0, w_sigma_inh=0, d=1, is_exc_func=lambda x: True, prob=0.01)
     # c6.connect(context)
 
-    c7 = RandomConnectorFixedProb(pre=i1, post=e1, w_mu=0, w_sigma=0, w_mu_inh=-1, w_sigma_inh=0.1, d=1, is_exc_func=lambda x: False, prob=0.01)
+    c7 = RandomConnectorFixedPre(pre=i1, post=e1, w_mu=0, w_sigma=0, w_mu_inh=-1, w_sigma_inh=0.1, d=1, is_exc_func=lambda x: False, pre_cons=6)
     c7.connect(context)
-    c8 = RandomConnectorFixedProb(pre=i1, post=e2, w_mu=0, w_sigma=0, w_mu_inh=-1, w_sigma_inh=0.1, d=1, is_exc_func=lambda x: False, prob=0.01)
+    c8 = RandomConnectorFixedPre(pre=i1, post=e2, w_mu=0, w_sigma=0, w_mu_inh=-1, w_sigma_inh=0.1, d=1, is_exc_func=lambda x: False, pre_cons=6)
     c8.connect(context)
 
 def main():
