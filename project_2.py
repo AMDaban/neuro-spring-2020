@@ -18,17 +18,17 @@ dt = 0.001
 
 first_non_zero_c_time = 0.5
 last_non_zero_c_time = 9.5
-random_c_func_maximum_c_change = 0.5
-random_c_func_maximum_c = 40
-initial_c = 20
+random_c_func_maximum_c_change = 0.1
+random_c_func_maximum_c = 10
+initial_c = 5
 c_samples = {}
 
-connections = 100
-w_con = 20
-w_in_con = -20
+connections = 10000
+w_con = 2
+w_in_con = -1.5
 d_con = 1
 
-tau = 10
+tau = 1
 u_r = -70
 u_t = -50
 r = 10
@@ -62,9 +62,6 @@ def get_pop_in_c():
 
 def get_neuron_init(context):
     def neuron_init(x, y):
-        # p = ((x * y_size + y) / n) + 1/2
-        # return LIF(context=context, tau=tau*p, u_r=u_r, u_t=u_t*p, r=r*p)
-
         return LIF(context=context, tau=tau * (random.random() + 0.1), u_r=u_r, u_t=u_t * (random.random() + 0.1),
                    r=r * (random.random() + 0.1))
 
