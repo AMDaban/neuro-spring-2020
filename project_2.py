@@ -8,6 +8,8 @@ import pandas as pd
 from neurokit.context import Context
 from neurokit.populations.population import Population
 from neurokit.models.lif import LIF
+from neurokit.connectors.full_connectors import FullConnector
+from neurokit.connectors.random_connectors import RandomConnectorFixedPre, RandomConnectorFixedProb
 
 x_size = 5
 y_size = 200
@@ -18,14 +20,16 @@ dt = 0.001
 
 first_non_zero_c_time = 0.5
 last_non_zero_c_time = 9.5
-random_c_func_maximum_c_change = 0.1
+random_c_func_maximum_c_change = 0.001
 random_c_func_maximum_c = 10
-initial_c = 5
+initial_c = 2.5
 c_samples = {}
 
-connections = 10000
-w_con = 2
-w_in_con = -1.5
+connections=10000
+w_con_mu = 5
+w_con_sigma = 0
+w_con_mu_inh = -1.5
+w_con_sigma_inh = 0
 d_con = 1
 
 tau = 1
@@ -33,6 +37,8 @@ u_r = -70
 u_t = -50
 r = 10
 
+def is_exc(src_idx):
+    return (src_idx[0] * y_size + src_idx[0]) <= exc_size 
 
 def get_pop_in_c():
     c = initial_c
@@ -66,30 +72,6 @@ def get_neuron_init(context):
                    r=r * (random.random() + 0.1))
 
     return neuron_init
-
-
-def connect_neurons(population):
-    connected_indices = set()
-    connected_neurons = 0
-    while connected_neurons < connections:
-        first_x, first_y = random.randint(0, x_size - 1), random.randint(0, y_size - 1)
-        sec_x, sec_y = random.randint(0, x_size - 1), random.randint(0, y_size - 1)
-
-        if (first_x, first_y) == (sec_x, sec_y):
-            continue
-
-        key = f"{first_x}_{first_y}_{sec_x}_{sec_y}"
-        if key in connected_indices:
-            continue
-        connected_indices.add(key)
-
-        if first_x * y_size + first_y <= exc_size:
-            w = w_con
-        else:
-            w = w_in_con
-
-        population.connect_two((first_x, first_y), (sec_x, sec_y), w, d_con)
-        connected_neurons += 1
 
 
 def plot_result(population):
@@ -134,7 +116,13 @@ def main():
     population = Population("main", (x_size, y_size), context, get_neuron_init(context))
     population.set_pop_in_c(get_pop_in_c())
 
-    connect_neurons(population)
+    connector = RandomConnectorFixedPre(population, population, w_con_mu, w_con_sigma, w_con_mu_inh, w_con_sigma_inh, d_con, is_exc, 15)
+    connector.connect(context)
+
+    # connector = RandomConnectorFixedProb(population, population, w_con_mu, w_con_sigma, w_con_mu_inh, w_con_sigma_inh, d_con, is_exc, 0.01)
+    # connector.connect(context)
+
+    print("simulating...")
 
     for i in range(simulation_steps):
         population.steps(1)
