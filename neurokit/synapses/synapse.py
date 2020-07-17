@@ -17,7 +17,7 @@ class Synapse:
         self.d_times = []
 
     def register_spike(self):
-        # print("SPIKE", self.src.name, self.context.t(), self.w)
+        # print("SPIKE", self.src.name, self.context.t())
         t, dt = self.context.t(), self.context.dt()
 
         self.s_times.append(t)
