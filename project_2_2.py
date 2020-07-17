@@ -18,9 +18,9 @@ dt = 0.001
 
 first_non_zero_c_time = 0.5
 last_non_zero_c_time = 9.5
-random_c_func_maximum_c_change = 0.5
-random_c_func_maximum_c = 40
-initial_c = 20
+random_c_func_maximum_c_change = 0.01
+random_c_func_maximum_c = 20
+initial_c = 10
 c_samples_1 = {}
 c_samples_2 = {}
 
@@ -29,7 +29,7 @@ w_ie = -1000
 w_ei = 1000
 d_con = 1
 
-tau = 4
+tau = 3
 u_r = -70
 u_t = -60
 r = 5
@@ -169,22 +169,24 @@ def main():
     pop_in_c_1 = get_pop_in_c(1)
     e1 = Population("e1", (x_size, y_size), context, get_neuron_init(context))
     e1.set_pop_in_c(pop_in_c_1)
-    connect_inner_neurons(e1, 1000, 100)
+    connect_inner_neurons(e1, 1000, 0.8)
 
     pop_in_c_2 = get_pop_in_c(2)
     e2 = Population("e2", (x_size, y_size), context, get_neuron_init(context))
     e2.set_pop_in_c(pop_in_c_2)
-    connect_inner_neurons(e2, 1000, 100)
+    connect_inner_neurons(e2, 1000, 0.8)
 
     i1 = Population("i1", (x_size, y_size), context, get_neuron_init(context))
 
-    connect_outer_neurons(e1, e2, context, 1000, 100)
-    connect_outer_neurons(e2, e1, context, 1000, 100)
+    connect_outer_neurons(e1, e2, context, 1000, 0.5)
+    connect_outer_neurons(e2, e1, context, 1000, 0.5)
 
-    connect_outer_neurons(e1, i1, context, 3000, 100)
-    connect_outer_neurons(e2, i1, context, 3000, 100)
-    connect_outer_neurons(i1, e1, context, 3000, -300)
-    connect_outer_neurons(i1, e2, context, 3000, -300)
+    connect_outer_neurons(e1, i1, context, 5000, 0.5)
+    connect_outer_neurons(e2, i1, context, 5000, 0.5)
+    connect_outer_neurons(i1, e1, context, 5000, -0.3)
+    connect_outer_neurons(i1, e2, context, 5000, -0.3)
+
+    print("simulating...")
 
     for i in range(simulation_steps):
         e1.steps(1)
