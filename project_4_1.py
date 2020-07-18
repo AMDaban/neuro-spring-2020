@@ -21,8 +21,8 @@ tau_n = 2
 tau_c = 2
 tau_d = 1
 
-p_d = 20
-n_d = -30
+p_d = 15
+n_d = -20
 t_d = 2
 
 # Neuron
