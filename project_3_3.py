@@ -6,7 +6,7 @@ from neurokit.models.lif import LIF
 
 pattern_1 = [1, 2, 2, 2, 1, 0, 0, 0, 0, 0]
 pattern_2 = [0, 0, 0, 0, 0, 3, 1, 2, 1, 1]
-last_applied_pattern = 1
+last_applied_pattern = 2
 
 # Simulation
 steps = 10000
@@ -15,7 +15,7 @@ steps = 10000
 dt = 0.1
 stdp_enabled = True
 a_p = 0.1
-a_n = -0.1
+a_n = -1
 tau_p = 2
 tau_n = 2
 
@@ -32,22 +32,22 @@ out_r = 1
 
 inh_tau = 2
 inh_u_r = -70
-inh_u_t = -65
+inh_u_t = -50
 inh_r = 1
 
 # Synapse
-mu = 1
+mu = 3
 sigma = 0.5
 d = 1
 
-inh_mu = 5
-sigma = 0.5
+inh_mu = 1
+inh_sigma = 0
 
 def get_neuron_init(context):
     def neuron_init(x, y):
-        if x == 12:
+        if y == 12:
             return LIF(context=context, tau=inh_tau, u_r=inh_u_r, u_t=inh_u_t, r=inh_r, name=f"({x}, {y})")
-        elif x < 10:
+        elif y < 10:
             return LIF(context=context, tau=inp_tau, u_r=inp_u_r, u_t=inp_u_t, r=inp_r, name=f"({x}, {y})")
         else:
             return LIF(context=context, tau=out_tau, u_r=out_u_r, u_t=out_u_t, r=out_r, name=f"({x}, {y})")
@@ -66,8 +66,8 @@ def main():
         pop.connect_two((0, i), (0, 11), w=np.random.normal(mu, sigma), d=d+1)
         pop.connect_two((0, i), (0, 12), w=np.random.normal(mu, sigma), d=d)
 
-    pop.connect_two((0, 12), (0, 10), w=-1 * np.random.normal(inh_mu, inh_sigma), d=d)
-    pop.connect_two((0, 12), (0, 11), w=-1 * np.random.normal(inh_mu, inh_sigma), d=d)
+    # pop.connect_two((0, 12), (0, 10), w=-1 * np.random.normal(inh_mu, inh_sigma), d=d)
+    # pop.connect_two((0, 12), (0, 11), w=-1 * np.random.normal(inh_mu, inh_sigma), d=d)
 
     d1 = pop.get_neuron(0, 10)
     d2 = pop.get_neuron(0, 11)

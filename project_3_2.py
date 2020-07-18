@@ -38,7 +38,7 @@ d = 1
 
 def get_neuron_init(context):
     def neuron_init(x, y):
-        if x < 10:
+        if y < 10:
             return LIF(context=context, tau=inp_tau, u_r=inp_u_r, u_t=inp_u_t, r=inp_r, name=f"({x}, {y})")
         else:
             return LIF(context=context, tau=out_tau, u_r=out_u_r, u_t=out_u_t, r=out_r, name=f"({x}, {y})")
