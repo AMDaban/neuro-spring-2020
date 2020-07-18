@@ -5,35 +5,40 @@ from neurokit.populations.population import Population
 from neurokit.models.lif import LIF
 from neurokit.learning_rule import RMSTDP, STDP
 
-pattern_1 = [1, 1, 0, 0, 0, 0, 3, 4, 5, 0]
-pattern_2 = [0, 0, 0, 0, 0, 0, 1, 1, 1, 1]
+pattern_1 = [1, 2, 2, 2, 1, 0, 0, 0, 0, 0]
+pattern_2 = [0, 0, 0, 0, 0, 3, 1, 2, 1, 1]
 last_applied_pattern = 2
 
 # Simulation
 steps = 10000
 
 # Context
-dt = 1
-a_p = 0.1
-a_n = -0.6
+dt = 0.1
+a_p = 0.5
+a_n = -1
 tau_p = 2
 tau_n = 2
-tau_c = 1
+tau_c = 2
 tau_d = 1
 
-p_d = 100
-n_d = -100
+p_d = 20
+n_d = -30
 t_d = 2
 
 # Neuron
-tau = 1
-u_r = -70
-u_t = -50
-r = 1
+inp_tau = 3
+inp_u_r = -70
+inp_u_t = -50
+inp_r = 1
+
+out_tau = 3
+out_u_r = -70
+out_u_t = -55
+out_r = 1
 
 # Synapse
-mu = 6
-sigma = 0.05
+mu = 3.3
+sigma = 0.5
 d = 1
 
 pop = None
@@ -64,13 +69,10 @@ def spike_cb(name):
 
 def get_neuron_init(context):
     def neuron_init(x, y):
-        if y == 10:
-            return LIF(context=context, tau=tau, u_r=u_r, u_t=-50, r=r, name=f"{x}_{y}", spike_cb=spike_cb)
-
-        if y == 11:
-            return LIF(context=context, tau=tau, u_r=u_r, u_t=-60, r=r, name=f"{x}_{y}", spike_cb=spike_cb)
-
-        return LIF(context=context, tau=tau, u_r=u_r, u_t=u_t, r=r, name=f"{x}_{y}", spike_cb=spike_cb)
+        if y < 10:
+            return LIF(context=context, tau=inp_tau, u_r=inp_u_r, u_t=inp_u_t, r=inp_r, name=f"{x}_{y}", spike_cb=spike_cb)
+        else:
+            return LIF(context=context, tau=out_tau, u_r=out_u_r, u_t=out_u_t, r=out_r, name=f"{x}_{y}", spike_cb=spike_cb)
 
     return neuron_init
 
@@ -108,7 +110,7 @@ def main():
     print_weights(pop)
 
     for i in range(steps):
-        if i % 100 == 0:
+        if i % 25 == 0:
             pat = pattern_1
             ap = 1
             if last_applied_pattern == 1:
@@ -120,7 +122,7 @@ def main():
             for idx, j in enumerate(pat):
                 n = pop.get_neuron(0, idx)
                 if j != 0:
-                    n.register_potential_change(40, context.t() + context.dt() * j)
+                    n.register_potential_change(100, context.t() + context.dt() * j)
 
         pop.steps(1)
         context.step()
@@ -128,7 +130,7 @@ def main():
     print_weights(pop)
     context._learning_rule = None
 
-    for i in range(1000):
+    for i in range(100):
         pop.steps(1)
         context.step()
 
@@ -138,13 +140,13 @@ def main():
     for idx, j in enumerate(pattern_1):
         n = pop.get_neuron(0, idx)
         if j != 0:
-            n.register_potential_change(40, context.t() + context.dt() * j)
-    for i in range(20):
+            n.register_potential_change(100, context.t() + context.dt() * j)
+    for i in range(25):
         pop.steps(1)
         context.step()
     print("end_pat_1")
 
-    for i in range(1000):
+    for i in range(100):
         pop.steps(1)
         context.step()
 
@@ -153,7 +155,7 @@ def main():
         n = pop.get_neuron(0, idx)
         if j != 0:
             n.register_potential_change(40, context.t() + context.dt() * j)
-    for i in range(20):
+    for i in range(25):
         pop.steps(1)
         context.step()
     print("end_pat_2")
