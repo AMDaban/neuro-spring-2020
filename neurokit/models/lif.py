@@ -89,9 +89,11 @@ class LIF:
         """
         t, dt = self.context.t(), self.context.dt()
 
+        potential_change = self._potential_changes.pop(t, 0)
+
         self._update_c()
 
-        next_u = self._u + self._comp_du()
+        next_u = self._u + self._comp_du() + potential_change
         next_t = t + dt
 
         spiked = False
@@ -113,9 +115,7 @@ class LIF:
 
     def _update_c(self):
         t = self.context.t()
-        potential_change = self._potential_changes.pop(t, 0)
-
-        self._c = float(potential_change + self._in_c(t))
+        self._c = float(self._in_c(t))
 
     def _comp_du(self):
         """
