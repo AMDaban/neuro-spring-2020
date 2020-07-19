@@ -45,9 +45,9 @@ t_d = 1
 
 # Connections
 con_prob = 0.5
-con_w_mu = 4
+con_w_mu = 10
 con_w_sigma = 0.1
-con_w_mu_inhb = -30
+con_w_mu_inhb = -20
 con_w_sigma_ihb = 0.1
 con_d_range = [1, 3]
 
